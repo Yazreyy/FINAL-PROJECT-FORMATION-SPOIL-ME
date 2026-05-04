@@ -4,9 +4,9 @@ class Commentaire {
 
 
 public function __construct(private string $texte, private bool $est_valide, private string $date_creation,
-private ?int $id = null, private ?int $id_review = null, private ?int $id_user = null,)
+private ?int $id = null, private ?int $id_review = null, private ?int $id_user = null)
 {
-    
+
 }
 
 public function getId() : ?int {

@@ -2,8 +2,9 @@
 
 class User{
     
-public function __construct(private ?int $id = null, private string $pseudo, private string $email,
-private string $password, private string $avatar, private string $role, private string $date_inscription)
+public function __construct(private string $pseudo, private string $email,
+private string $password, private ?string $avatar = null, private string $role, private string $date_inscription,
+private ?int $id = null)
 {
     
 }
@@ -14,7 +15,6 @@ public function getId() : ?int {
 public function setId(int $id) : void {
     $this->id = $id;
 }
-
 public function getPseudo() : string {
     return $this->pseudo;
 }
@@ -36,10 +36,10 @@ public function setPassword(string $password) : void {
     $this->password = $password;
 }
 
-public function getAvatar() : string {
+public function getAvatar() : ?string {
     return $this->avatar;
 }
-public function setAvatar(string $avatar) : void {
+public function setAvatar(?string $avatar) : void {
     $this->avatar = $avatar;
 }
 
@@ -64,6 +64,10 @@ public function isAdmin() : bool {
 public function getAvatarUrl() : string {
     //Si $this->avatar === null alors il retourne la valeur par defaut//
     return $this->avatar ?? 'uploads/avatar/default.jpg';
+}
+
+public function isVip() : bool {
+    return $this->role === 'vip';
 }
 
 

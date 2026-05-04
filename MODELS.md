@@ -15,7 +15,7 @@ Représente un utilisateur de la plateforme.
 | `$email` | string | Adresse email |
 | `$mdp` | string | Mot de passe hashé |
 | `$avatar` | ?string | Chemin vers l'image de profil (nullable) |
-| `$role` | string | Rôle : `user` ou `admin` |
+| `$role` | string | Rôle : `user`, `vip` ou `admin` |
 | `$date_inscription` | string | Date d'inscription |
 
 **Getters / Setters** : un getter et un setter pour chaque propriété.
@@ -25,6 +25,7 @@ Représente un utilisateur de la plateforme.
 | Méthode | Description |
 |---------|-------------|
 | `isAdmin()` | Retourne `true` si le rôle de l'utilisateur est `admin` |
+| `isVip()` | Retourne `true` si le rôle de l'utilisateur est `vip` |
 | `getAvatarUrl()` | Retourne le chemin de l'avatar, ou une image par défaut si aucun avatar n'est défini |
 
 ---
@@ -108,24 +109,6 @@ Représente un avis rédigé par un utilisateur sur une série.
 
 ---
 
-## Modèle `Badge`
-
-Représente un badge attribuable aux utilisateurs.
-
-**Propriétés** *(correspondent aux colonnes de la table `badges`)*
-
-| Propriété | Type PHP | Description |
-|-----------|----------|-------------|
-| `$id` | int | Identifiant unique |
-| `$nom` | string | Nom du badge |
-| `$description` | string | Description affichée sur le profil |
-| `$icone` | string | Chemin vers l'icône du badge |
-| `$condition_obtention` | string | Condition pour obtenir le badge |
-
-**Getters / Setters** : un getter et un setter pour chaque propriété.
-
----
-
 ## Modèle `Note`
 
 Représente une note attribuée par un utilisateur sur une série.
@@ -153,9 +136,9 @@ Représente un like posé par un utilisateur sur une review ou un commentaire.
 | Propriété | Type PHP | Description |
 |-----------|----------|-------------|
 | `$id` | ?int | Identifiant unique |
-| `$user_id` | ?int | ID de l'utilisateur |
-| `$review_id` | ?int | ID de la review likée (null si like sur commentaire) |
-| `$commentaire_id` | ?int | ID du commentaire liké (null si like sur review) |
+| `$id_user` | ?int | ID de l'utilisateur |
+| `$id_review` | ?int | ID de la review likée (null si like sur commentaire) |
+| `$id_commentaire` | ?int | ID du commentaire liké (null si like sur review) |
 | `$date_creation` | string | Date du like |
 
 **Getters / Setters** : un getter et un setter pour chaque propriété.
@@ -171,9 +154,9 @@ Représente un commentaire rédigé par un utilisateur sur une review.
 | Propriété | Type PHP | Description |
 |-----------|----------|-------------|
 | `$id` | ?int | Identifiant unique |
-| `$review_id` | ?int | ID de la review commentée |
-| `$user_id` | ?int | ID de l'utilisateur auteur du commentaire |
-| `$contenu` | string | Contenu du commentaire |
+| `$id_review` | ?int | ID de la review commentée |
+| `$id_user` | ?int | ID de l'utilisateur auteur du commentaire |
+| `$texte` | string | Contenu du commentaire |
 | `$est_valide` | bool | `true` si le commentaire a été validé par un admin |
 | `$date_creation` | string | Date de rédaction |
 

@@ -5,7 +5,7 @@ class Like {
 public function __construct(private string $date_creation, private ?int $id = null,
 private ?int $id_user = null, private ?int $id_review = null, private ?int $id_commentaire = null)
 {
-    
+
 }
 
 public function getCreateDate() : string {

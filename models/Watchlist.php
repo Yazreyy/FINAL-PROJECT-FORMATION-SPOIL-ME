@@ -2,8 +2,8 @@
 
 class Watchlist {
     
-public function __construct(private ?int $id_serie,private string $statut,
-private ?int $id = null, private ?int $id_user = null, private string $date_ajout)
+public function __construct(private ?int $id_serie,private string $statut,private string $date_ajout,
+private ?int $id = null, private ?int $id_user = null)
 {
     
 }

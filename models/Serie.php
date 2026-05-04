@@ -5,8 +5,11 @@ class Serie{
 
 public function __construct(private string $titre,
 private string $synopsis, private string $date_sortie, private string $image,
-private string $statut, private string $date_creation,
-private float $note_moyenne, private ?int $created_by = null,private ?int $id = null, private ?int $id_tmdb = null,
+private float $note_moyenne,private string $statut, private string $date_creation,
+private ?int $created_by = null,
+private ?int $id = null, private ?int $id_tmdb = null,
+private ?string $format = null, private ?string $createur = null,
+private ?string $pays = null, private ?string $langue = null
 )
 {
     
@@ -83,5 +86,33 @@ public function setCreatedDate(string $date_creation) : void {
 }
 public function isFinish() : bool {
     return $this->statut === 'terminée';
+}
+
+public function getFormat() : ?string {
+    return $this->format;
+}
+public function setFormat(?string $format) : void {
+    $this->format = $format;
+}
+
+public function getCreateur() : ?string {
+    return $this->createur;
+}
+public function setCreateur(?string $createur) : void {
+    $this->createur = $createur;
+}
+
+public function getPays() : ?string {
+    return $this->pays;
+}
+public function setPays(?string $pays) : void {
+    $this->pays = $pays;
+}
+
+public function getLangue() : ?string {
+    return $this->langue;
+}
+public function setLangue(?string $langue) : void {
+    $this->langue = $langue;
 }
 }
