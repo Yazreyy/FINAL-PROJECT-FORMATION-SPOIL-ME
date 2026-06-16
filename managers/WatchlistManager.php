@@ -1,71 +1,68 @@
 <?php
 
 class WatchListManager extends AbstractManager {
-    
+
 public function __construct()
 {
-     parent::__construct();
+    parent::__construct();
 }
 
 public function add(Watchlist $watchlist) : void {
-    $query = $this->db->prepare('INSERT INTO watchlist (id_serie, statut, date_ajout, id_user)
-    VALUES (:id_serie, :statut, :date_ajout, :id_user)');
-    $parameters = [
-        'id_serie' => $watchlist->getSerieid(),
-        'statut' => $watchlist->getStatut(),
-        'date_ajout' => $watchlist->getDate(),
-        'id_user' => $watchlist->getUserid()
-    ];
-    $query->execute($parameters);
+    $query = $this->db->prepare('INSERT INTO watchlist (series_id, status, added_at, user_id)
+        VALUES (:series_id, :status, :added_at, :user_id)');
+    $query->execute([
+        'series_id' => $watchlist->getSeriesId(),
+        'status'    => $watchlist->getStatus(),
+        'added_at'  => $watchlist->getAddedAt(),
+        'user_id'   => $watchlist->getUserId()
+    ]);
     $watchlist->setId($this->db->lastInsertId());
 }
 
 public function remove(int $id) : void {
-    $query = $this->db->prepare('DELETE FROM Watchlist WHERE id = :id');
-    $parameters = [
-        'id' => $id
-    ];
-    $query->execute($parameters);
+    $query = $this->db->prepare('DELETE FROM watchlist WHERE id = :id');
+    $query->execute(['id' => $id]);
 }
 
-public function findByUser(int $id_user) : array {
-    $query = $this->db->prepare('SELECT * FROM Watchlist WHERE id_user = :id_user');
-    $parameters = [
-        'id_user' => $id_user
-    ];
-    $query->execute($parameters);
-    $results = $query->fetchAll(PDO::FETCH_ASSOC);
+public function findByUser(int $user_id) : array {
+    $query = $this->db->prepare('SELECT * FROM watchlist WHERE user_id = :user_id');
+    $query->execute(['user_id' => $user_id]);
     $watchlist = [];
-
-    foreach($results as $result) {
-        $watchlist[] = new Watchlist($result['id_serie'], $result['statut'],
-            $result['date_ajout'], $result['id'], $result['id_user']);
+    foreach($query->fetchAll(PDO::FETCH_ASSOC) as $result) {
+        $watchlist[] = new Watchlist($result['series_id'], $result['status'],
+            $result['added_at'], $result['id'], $result['user_id']);
     }
     return $watchlist;
 }
 
 public function update(Watchlist $watchlist) : void {
-    $query = $this->db->prepare('UPDATE Watchlist SET statut = :statut WHERE id = :id');
-    $parameters = [
-        'statut' => $watchlist->getStatut(),
-        'id'=> $watchlist->getId()
-    ];
-    $query->execute($parameters);
+    $query = $this->db->prepare('UPDATE watchlist SET status = :status WHERE id = :id');
+    $query->execute([
+        'status' => $watchlist->getStatus(),
+        'id'     => $watchlist->getId()
+    ]);
 }
 
-public function findByUserAndStatut(int $id_user, string $statut) : array {
+public function findByUserAndStatut(int $user_id, string $status) : array {
     $query = $this->db->prepare('
-    SELECT Watchlist.*, Serie.titre, Serie.image, Serie.statut AS serie_statut
-    FROM WATCHLIST
-    JOIN Serie ON Watchlist.id_serie = Series.id
-    WHERE Watchlist.id_user = :id_user AND Watchlist.statut = :statut');
-    $parameters = [
-        'id_user' => $id_user,
-        'statut' => $statut
-    ];
-    $query->execute($parameters);
+        SELECT watchlist.*, series.title, series.image, series.status AS series_status
+        FROM watchlist
+        JOIN series ON watchlist.series_id = series.id
+        WHERE watchlist.user_id = :user_id AND watchlist.status = :status
+    ');
+    $query->execute([
+        'user_id' => $user_id,
+        'status'  => $status
+    ]);
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
-
+public function countByUserAndStatus(int $user_id, string $status) : int {
+    $query = $this->db->prepare('SELECT COUNT(*) FROM watchlist WHERE user_id = :user_id AND status = :status');
+    $query->execute([
+        'user_id' => $user_id,
+        'status'  => $status
+    ]);
+    return (int)$query->fetchColumn();
+}
 }

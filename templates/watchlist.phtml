@@ -1,0 +1,31 @@
+<section class="watchlist-page">
+    <h1>Ma Watchlist</h1>
+
+    <div class="watchlist-tabs">
+        <a href="/Spoil-Me/?route=watchlist&statut=à voir" class="<?= $statut === 'à voir' ? 'active' : '' ?>">À voir</a>
+        <a href="/Spoil-Me/?route=watchlist&statut=vu" class="<?= $statut === 'vu' ? 'active' : '' ?>">Vu</a>
+    </div>
+
+    <?php if (empty($watchlist)): ?>
+        <p>Aucune série dans cette liste.</p>
+    <?php else: ?>
+        <div class="series-grid">
+            <?php foreach ($watchlist as $item): ?>
+                <div class="serie-card">
+                    <a href="/Spoil-Me/?route=serie&id=<?= $item['series_id'] ?>">
+                        <img src="<?= $item['image'] ?>" alt="">
+                        <h3><?= $item['title'] ?></h3>
+                    </a>
+                    <?php if ($statut === 'à voir'): ?>
+                        <form action="/Spoil-Me/?route=watchlist-status" method="post">
+                            <input type="hidden" name="id" value="<?= $item['id'] ?>">
+                            <input type="hidden" name="statut" value="vu">
+                            <button type="submit">Marquer comme vu</button>
+                        </form>
+                    <?php endif; ?>
+                    <a href="/Spoil-Me/?route=remove-watchlist&id=<?= $item['id'] ?>&id_serie=<?= $item['series_id'] ?>" class="watchlist-remove">Retirer</a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</section>

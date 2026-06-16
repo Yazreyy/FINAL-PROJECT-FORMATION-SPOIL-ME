@@ -19,6 +19,7 @@ require_once 'managers/UserManager.php';
 require_once 'managers/WatchlistManager.php';
 
 
+require_once 'controllers/AbstractController.php';
 require_once 'controllers/AdminController.php';
 require_once 'controllers/AuthController.php';
 require_once 'controllers/ReviewController.php';

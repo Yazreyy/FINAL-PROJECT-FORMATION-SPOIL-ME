@@ -1,0 +1,60 @@
+<section class="profile-page">
+    <div class="profile-header">
+        <img src="<?= $user->getAvatarUrl() ?>" alt="">
+        <div>
+            <h1><?= $user->getUsername() ?></h1>
+            <span class="profile-role"><?= $user->getRole() ?></span>
+            <p>Membre depuis le <?= $user->getCreatedAt() ?></p>
+            <form action="/Spoil-Me/?route=update-avatar" method="post" enctype="multipart/form-data" class="avatar-form">
+                <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none" onchange="this.form.submit()">
+                <button type="button" onclick="document.getElementById('avatar-input').click()">Changer la photo</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="stats-block">
+        <h3>Statistiques</h3>
+
+        <h4>Critiques publiées (<?= $stats['reviews'] ?>)</h4>
+        <?php if (empty($reviews)): ?>
+            <p>Aucune critique publiée.</p>
+        <?php else: ?>
+            <div class="feed">
+                <?php foreach ($reviews as $review): ?>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <img src="<?= $review['series_image'] ?>" alt="">
+                            <div>
+                                <span class="review-username"><?= $review['series_title'] ?></span>
+                                <?php if (!empty($review['note_value'])): ?>
+                                    <span class="review-meta"><?= str_repeat('⭐', (int)$review['note_value']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <span class="review-date"><?= $review['created_at'] ?></span>
+                        </div>
+                        <p class="review-content"><?= $review['content'] ?></p>
+                        <div class="review-footer">
+                            <a href="/Spoil-Me/?route=review-delete&id=<?= $review['id'] ?>&id_serie=<?= $review['series_id'] ?>&redirect=profile">Supprimer</a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <h4>Séries vues (<?= $stats['series_vues'] ?>)</h4>
+        <?php if (empty($watchedSeries)): ?>
+            <p>Aucune série marquée comme vue.</p>
+        <?php else: ?>
+            <div class="series-grid">
+                <?php foreach ($watchedSeries as $item): ?>
+                    <a href="/Spoil-Me/?route=serie&id=<?= $item['series_id'] ?>">
+                        <div class="serie-card">
+                            <img src="<?= $item['image'] ?>" alt="">
+                            <h3><?= $item['title'] ?></h3>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>

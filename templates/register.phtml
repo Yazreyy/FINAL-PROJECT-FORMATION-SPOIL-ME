@@ -1,0 +1,17 @@
+<div class="auth-page">
+    <section class="auth-form">
+        <h2>Créer un compte</h2>
+        <?php if (!empty($error)): ?>
+            <p class="error"><?= $error ?></p>
+        <?php endif; ?>
+        <form action="/Spoil-Me/?route=check-register" method="post">
+            <input type="text" name="pseudo" placeholder="Pseudo" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            <div class="auth-form-actions">
+                <button type="submit">S'inscrire</button>
+                <p>Déjà un compte ? <a href="/Spoil-Me/?route=login">Se connecter</a></p>
+            </div>
+        </form>
+    </section>
+</div>

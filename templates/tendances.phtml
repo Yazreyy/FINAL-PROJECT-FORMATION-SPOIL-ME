@@ -1,0 +1,84 @@
+<div class="tendances-wrapper">
+    <div class="tendances-main">
+        <section>
+            <h2>FIL D'ACTUALITÉ</h2>
+            <div class="feed">
+                <?php foreach ($feed as $item): ?>
+                    <?php if ($item['type'] === 'episode'): ?>
+                        <a href="/Spoil-Me/?route=serie&id=<?= $item['serie']->getId() ?>" class="news-card">
+                            <img src="<?= $item['serie']->getImage() ?>" alt="">
+                            <div class="news-content">
+                                <span class="news-badge">NEWS</span>
+                                <h3><?= $item['serie']->getTitle() ?> — Saison <?= $item['next_episode']['season_number'] ?>, Épisode <?= $item['next_episode']['episode_number'] ?></h3>
+                                <?php if (!empty($item['next_episode']['name'])): ?>
+                                    <p class="news-episode-title">« <?= $item['next_episode']['name'] ?> »</p>
+                                <?php endif; ?>
+                                <?php if (!empty($item['next_episode']['overview'])): ?>
+                                    <p><?= $item['next_episode']['overview'] ?></p>
+                                <?php endif; ?>
+                                <span class="news-date">Diffusion prévue le <?= $item['next_episode']['air_date'] ?></span>
+                            </div>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <section>
+            <h2>NOUVELLES SAISONS</h2>
+            <div class="feed">
+                <?php foreach ($feed as $item): ?>
+                    <?php if ($item['type'] === 'season'): ?>
+                        <a href="/Spoil-Me/?route=serie&id=<?= $item['serie']->getId() ?>" class="news-card">
+                            <img src="<?= $item['serie']->getImage() ?>" alt="">
+                            <div class="news-content">
+                                <span class="news-badge season">NOUVELLE SAISON</span>
+                                <h3><?= $item['serie']->getTitle() ?> — Saison <?= $item['number_of_seasons'] ?> annoncée</h3>
+                            </div>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <section>
+            <h2>TOURNAGES EN COURS</h2>
+            <div class="feed">
+                <?php foreach ($feed as $item): ?>
+                    <?php if ($item['type'] === 'production'): ?>
+                        <a href="/Spoil-Me/?route=serie&id=<?= $item['serie']->getId() ?>" class="news-card">
+                            <img src="<?= $item['serie']->getImage() ?>" alt="">
+                            <div class="news-content">
+                                <span class="news-badge production">TOURNAGE</span>
+                                <h3><?= $item['serie']->getTitle() ?> est actuellement en tournage</h3>
+                            </div>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    </div>
+
+    <aside class="tendances-side">
+        <h2>CRITIQUES DE LA COMMUNAUTÉ</h2>
+        <div class="feed">
+            <?php foreach ($recentReviews as $review): ?>
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="<?= $review['avatar'] ?>" alt="">
+                        <div>
+                            <span class="review-username"><?= $review['username'] ?></span>
+                            <span class="review-meta">A noté <strong><?= $review['series_title'] ?></strong> <?= str_repeat('⭐', (int)($review['note_value'] ?? 0)) ?></span>
+                        </div>
+                        <span class="review-date"><?= $review['created_at'] ?></span>
+                    </div>
+                    <p class="review-content"><?= $review['content'] ?></p>
+                    <div class="review-footer">
+                        <span>♥ <?= $review['likes_count'] ?? 0 ?></span>
+                        <span>💬 réponses</span>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </aside>
+</div>

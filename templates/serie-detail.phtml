@@ -1,0 +1,83 @@
+<section class="serie-hero" style="background-image: url('<?= $serie->getBackdrop() ?>')">
+    <div class="serie-hero-content">
+        <div class="serie-hero-badges">
+            <span><?= $serie->getAverageRating() ?></span>
+            <span><?= $serie->getReleaseDate() ?></span>
+            <span><?= $plateformes[0]['name'] ?? '' ?></span>
+            <span><?= $serie->getEpisodes() ?></span>
+        </div>
+        <h1><?= $serie->getTitle() ?></h1>
+        <p><?= $serie->getSynopsis() ?></p>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <form action="/Spoil-Me/?route=add-watchlist" method="post" style="display:inline">
+                <input type="hidden" name="id_serie" value="<?= $serie->getId() ?>">
+                <button type="submit">Watchlist</button>
+            </form>
+        <?php endif; ?>
+        <button>Ecrire review</button>
+    </div>
+</section>
+
+<section>
+    <nav>
+        <ul>
+            <li>Critiques</li>
+            <li>Casting</li>
+            <li>Saisons</li>
+            <li>Théories</li>
+        </ul>
+    </nav>
+</section>
+
+<section class="serie-body">
+    <div class="serie-main">
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <form action="/Spoil-Me/?route=review-add" method="post" class="review-form">
+                <input type="hidden" name="id_serie" value="<?= $serie->getId() ?>">
+                <select name="note" required>
+                    <option value="">Note...</option>
+                    <option value="1">1 ⭐</option>
+                    <option value="2">2 ⭐</option>
+                    <option value="3">3 ⭐</option>
+                    <option value="4">4 ⭐</option>
+                    <option value="5">5 ⭐</option>
+                </select>
+                <textarea name="texte" placeholder="Écrire une critique..." required></textarea>
+                <button type="submit">Publier</button>
+            </form>
+        <?php endif; ?>
+
+        <?php foreach ($reviews as $review): ?>
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="<?= $review['avatar'] ?>" alt="">
+                    <div>
+                        <span class="review-username"><?= $review['username'] ?></span>
+                    </div>
+                    <?php if (!empty($review['note_value'])): ?>
+                        <span class="review-meta"><?= str_repeat('⭐', (int)$review['note_value']) ?></span>
+                    <?php endif; ?>
+                    <span class="review-date"><?= $review['created_at'] ?></span>
+                </div>
+                <p class="review-content"><?= $review['content'] ?></p>
+                <div class="review-footer">
+                    <span>♥ <?= $review['likes_count'] ?? 0 ?></span>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <div class="serie-aside">
+
+    </div>
+</section>
+
+<section class="casting">
+    <?php foreach (array_slice($casting, 0, 8) as $acteur): ?>
+        <div>
+            <img src="https://image.tmdb.org/t/p/w200<?= $acteur['profile_path'] ?>" alt="">
+            <h3><?= $acteur['name'] ?></h3>
+            <p><?= $acteur['character'] ?></p>
+        </div>
+    <?php endforeach; ?>
+
+</section>

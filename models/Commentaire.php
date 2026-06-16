@@ -2,56 +2,28 @@
 
 class Commentaire {
 
-
-public function __construct(private string $texte, private bool $est_valide, private string $date_creation,
-private ?int $id = null, private ?int $id_review = null, private ?int $id_user = null)
+public function __construct(private string $content, private bool $is_valid, private string $created_at,
+private ?int $id = null, private ?int $review_id = null, private ?int $user_id = null)
 {
-
 }
 
-public function getId() : ?int {
-    return $this->id;
-}
-public function setId(?int $id) : void {
-    $this->id = $id;
-}
+public function getId() : ?int { return $this->id; }
+public function setId(?int $id) : void { $this->id = $id; }
 
-public function getReviewId() : ?int {
-    return $this->id_review;
-}
-public function setReviewId(?int $id_review) : void {
-    $this->id_review = $id_review;
-}
+public function getReviewId() : ?int { return $this->review_id; }
+public function setReviewId(?int $review_id) : void { $this->review_id = $review_id; }
 
-public function getUserId() : ?int {
-    return $this->id_user;
-}
-public function setUserId(?int $id_user) : void {
-    $this->id_user = $id_user;
-}
+public function getUserId() : ?int { return $this->user_id; }
+public function setUserId(?int $user_id) : void { $this->user_id = $user_id; }
 
-public function getTexte() : string {
-    return $this->texte;
-}
-public function setTexte(string $texte) : void {
-    $this->texte = $texte;
-}
+public function getContent() : string { return $this->content; }
+public function setContent(string $content) : void { $this->content = $content; }
 
-public function getValidate() : bool {
-    return $this->est_valide;
-}
-public function setValidate(bool $est_valide) : void {
-    $this->est_valide = $est_valide;
-}
-public function isValidate() : bool {
-    //vérifie si c'est bien validé//
-    return $this->est_valide === true;
-}
+public function getIsValid() : bool { return $this->is_valid; }
+public function setIsValid(bool $is_valid) : void { $this->is_valid = $is_valid; }
 
-public function getDate() : string {
-    return $this->date_creation;
-}
-public function setDate(string $date_creation) : void {
-    $this->date_creation = $date_creation;
-}
+public function isValid() : bool { return $this->is_valid === true; }
+
+public function getCreatedAt() : string { return $this->created_at; }
+public function setCreatedAt(string $created_at) : void { $this->created_at = $created_at; }
 }

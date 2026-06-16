@@ -16,4 +16,8 @@ public function __construct()
     );
     
 }
+
+public function getDb() : PDO {
+    return $this->db;
+}
 }

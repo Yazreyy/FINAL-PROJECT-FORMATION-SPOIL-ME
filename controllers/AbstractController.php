@@ -2,13 +2,16 @@
 
 abstract class AbstractController {
     
-protected function render(string $template, array $data = []) : void  {
-extract($data); 
-require "templates/{$template}.phtml";
+protected function render(string $template, array $data = []) : void {
+    extract($data);
+    ob_start();
+    require "templates/{$template}.phtml";
+    $content = ob_get_clean();
+    require "templates/layout.phtml";
 }
 
 protected function redirect(string $route) : void {
-    header ("Location: /{$route}");
+    header ("Location: /Spoil-Me/{$route}");
     exit;
 }
 

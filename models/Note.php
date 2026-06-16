@@ -2,46 +2,23 @@
 
 class Note{
 
-public function __construct(private int $valeur, private string $date_creation,
-private ?int $id = null, private ?int $id_user = null, private ?int $id_serie = null)
+public function __construct(private int $value, private string $created_at,
+private ?int $id = null, private ?int $user_id = null, private ?int $series_id = null)
 {
-    
 }
 
-public function getValeur() : int {
-    return $this->valeur;
-}
-public function setValeur(int $valeur) : void {
-    $this->valeur = $valeur;
-}
+public function getValue() : int { return $this->value; }
+public function setValue(int $value) : void { $this->value = $value; }
 
-public function getCreateDate() : string {
-    return $this->date_creation;
-}
-public function setCreateDate(string $date_creation) : void {
-    $this->date_creation = $date_creation;
-} 
+public function getCreatedAt() : string { return $this->created_at; }
+public function setCreatedAt(string $created_at) : void { $this->created_at = $created_at; }
 
-public function getId() : ?int {
-    return $this->id;
-}
-public function setId(?int $id) : void {
-    $this->id = $id;
-}
+public function getId() : ?int { return $this->id; }
+public function setId(?int $id) : void { $this->id = $id; }
 
+public function getUserId() : ?int { return $this->user_id; }
+public function setUserId(?int $user_id) : void { $this->user_id = $user_id; }
 
-public function getUserid() : ?int {
-    return $this->id_user;
-}
-public function setUserid(?int $id_user) : void {
-    $this->id_user = $id_user;
-}
-
-public function getSerieid() : ?int {
-    return $this->id_serie;
-}
-public function setSerieid(?int $id_serie) : void {
-    $this->id_serie = $id_serie;
-}
-
+public function getSeriesId() : ?int { return $this->series_id; }
+public function setSeriesId(?int $series_id) : void { $this->series_id = $series_id; }
 }

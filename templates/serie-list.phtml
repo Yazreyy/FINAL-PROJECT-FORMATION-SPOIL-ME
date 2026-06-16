@@ -1,0 +1,63 @@
+<div class="catalogue-header">
+    <h1>CATALOGUE DES SERIES</h1>
+    <form action="/Spoil-Me/?route=series" method="GET" class="search-bar">
+        <input type="hidden" name="route" value="series">
+        <input type="text" name="titre" placeholder="Titre, acteur, réalisateur..." value="<?= $filters['titre'] ?? '' ?>">
+        <button type="submit">🔍</button>
+    </form>
+</div>
+
+<div class="catalogue-content">
+    <form action="/Spoil-Me/?route=series" method="GET" class="filters-bar">
+        <input type="hidden" name="route" value="series">
+        <div class="filters-row">
+            <select name="genre_id">
+                <option value="">Tous les genres</option>
+                <?php foreach ($genres as $genre): ?>
+                    <option value="<?= $genre['id'] ?>" <?= (string)($filters['genre_id'] ?? '') === (string)$genre['id'] ? 'selected' : '' ?>><?= $genre['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+            <select name="plateforme_id">
+                <option value="">Toutes les plateformes</option>
+                <?php foreach ($plateformes as $plateforme): ?>
+                    <option value="<?= $plateforme['id'] ?>" <?= (string)($filters['plateforme_id'] ?? '') === (string)$plateforme['id'] ? 'selected' : '' ?>><?= $plateforme['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+            <select name="sort">
+                <option value="nouveautes" <?= $sort === 'nouveautes' ? 'selected' : '' ?>>Nouveautés</option>
+                <option value="populaire" <?= $sort === 'populaire' ? 'selected' : '' ?>>Populaires</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-apply">Appliquer les filtres</button>
+    </form>
+
+    <div class="series-grid">
+        <?php foreach ($series as $serie): ?>
+            <a href="/Spoil-Me/?route=serie&id=<?= $serie->getId() ?>">
+                <?php
+                $rating5   = min(5, max(0, $serie->getAverageRating() / 2));
+                $fullStars = (int)floor($rating5);
+                $halfStar  = ($rating5 - $fullStars) >= 0.5;
+                ?>
+                <div class="serie-card">
+                    <img src="<?= $serie->getImage() ?>" alt="<?= $serie->getTitle() ?>">
+                    <span class="serie-stars">
+                        <?php for ($i = 0; $i < $fullStars; $i++): ?><span class="star full"></span><?php endfor; ?>
+                        <?php if ($halfStar): ?><span class="star half"></span><?php endif; ?>
+                    </span>
+                    <h3><?= $serie->getTitle() ?></h3>
+                    <p><?= $serie->getReleaseDate() ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    </div>
+    <div class="pagination">
+        <?php if ($page > 1): ?>
+            <a href="/Spoil-Me/?route=series&page=<?= $page - 1 ?>">&#8249;</a>
+        <?php else: ?>
+            <span class="pagination-disabled">&#8249;</span>
+        <?php endif; ?>
+        <span class="pagination-current"><?= $page ?></span>
+        <a href="/Spoil-Me/?route=series&page=<?= $page + 1 ?>">&#8250;</a>
+    </div>
+</div>

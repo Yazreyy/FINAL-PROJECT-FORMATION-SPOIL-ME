@@ -1,0 +1,101 @@
+<section class="hero">
+    <div class="hero-left">
+        
+        <h1>OUVREZ <span style="color:#7C3AED">L'ŒIL</span> SUR VOS SÉRIES</h1>
+        <p>Découvrez, notez et débattez de vos séries préférées.<br>
+            Rejoignez la communauté francophone la plus<br>
+            passionnée.</p>
+        <div class="hero-buttons">
+            <button class="btn-primary">▶ Commencer l'exploration</button>
+            <button class="btn-secondary">🔍 Recherche avancée</button>
+        </div>
+    </div>
+    <div class="hero-right">
+        <?php if (!empty($topSeries)): ?>
+            <div class="serie-card">
+                <div class="hero-card-img">
+                    <img src="<?= $topSeries[0]->getImage() ?>" alt="">
+                    <div class="score"><?= number_format($topSeries[0]->getAverageRating(), 1) ?></div>
+                    <h2><?= $topSeries[0]->getTitle() ?></h2>
+                </div>
+                <div class="hero-card-body">
+                    <p><?= $topSeries[0]->getSynopsis() ?></p>
+                    <div class="hero-tags">
+                        <span>Sci-Fi</span>
+                        <span>Drama</span>
+                        <button class="btn-fiche">Voir la fiche →</button>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
+<section class="top-series">
+    <h2>SERIES DU MOMENTS</h2>
+    <p>Les plus discutées par la communauté cette semaine</p>
+    <div class="top-grid">
+        <?php foreach ($topSeries as $index => $serie): ?>
+            <div class="top-card">
+                <div class="top-card-img" style="background-image: url('<?= $serie->getImage() ?>')">
+                    <span class="top-badge">TOP <?= $index + 1 ?></span>
+                    <h3><?= $serie->getTitle() ?></h3>
+                </div>
+                <div class="top-card-body">
+                    <span>⭐ <?= $serie->getAverageRating() ?></span>
+                    <p><?= $serie->getSynopsis() ?></p>
+                    <button>Ajouter à ma liste</button>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <a href="/?route=series">Voir tout le classement →</a>
+</section>
+<section class="recent-reviews">
+    <h2>ACTIVITÉ DE LA <span>COMMUNAUTÉ</span></h2>
+    <p>Les dernières critiques, théories et débats de nos membres.</p>
+
+    <div class="reviews-layout">
+        <div class="reviews-left">
+            <?php if (!empty($recentReviews)): ?>
+                <?php foreach ($recentReviews as $review): ?>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <img src="<?= $review['avatar'] ?>" alt="">
+                            <div>
+                                <span class="review-username"><?= $review['username'] ?></span>
+                                <span class="review-meta">A noté <strong><?= $review['series_title'] ?></strong> <?= str_repeat('⭐', (int)($review['note_value'] ?? 0)) ?></span>
+                            </div>
+                            <span class="review-date"><?= $review['created_at'] ?></span>
+                        </div>
+                        <p class="review-content"><?= $review['content'] ?></p>
+                        <div class="review-footer">
+                            <span>♥ <?= $review['likes_count'] ?? 0 ?></span>
+                            <span>💬 réponses</span>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>Aucune critique pour le moment.</p>
+            <?php endif; ?>
+        </div>
+        <div class="reviews-right">
+            <div class="stats-block">
+                <h3>Statistiques Globales</h3>
+                <p>Séries référencées <span><?= $stats['series'] ?></span></p>
+                <p>Critiques publiées <span><?= $stats['reviews'] ?></span></p>
+                <p>Membres actifs <span><?= $stats['membres'] ?></span></p>
+            </div>
+            <div class="vip-block">
+                <h3>Membres VIP de la semaine</h3>
+                <?php foreach ($vipMembers as $index => $vip): ?>
+                    <div class="vip-item">
+                        <span><?= $index + 1 ?></span>
+                        <img src="<?= $vip->getAvatarUrl() ?>" alt="">
+                        <span><?= $vip->getUsername() ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="stats"></section>
