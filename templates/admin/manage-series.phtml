@@ -1,0 +1,27 @@
+<section class="admin-manage-series">
+    <h1>Gestion des séries</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($series as $serie): ?>
+                <tr>
+                    <td><?= htmlspecialchars($serie->getTitle()) ?></td>
+                    <td><?= $serie->getStatus() ?></td>
+                    <td>
+                        <a href="/Spoil-Me/?route=admin-series-edit&id=<?= $serie->getId() ?>">Modifier</a>
+                        <form action="/Spoil-Me/?route=admin-series-delete&id=<?= $serie->getId() ?>" method="post" onsubmit="return confirm('Supprimer cette série ?')" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</section>

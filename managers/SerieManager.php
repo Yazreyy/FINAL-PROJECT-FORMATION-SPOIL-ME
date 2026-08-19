@@ -136,8 +136,10 @@ class SerieManager extends AbstractManager
 
     public function delete(int $id): void
     {
-        $query = $this->db->prepare('DELETE FROM series WHERE id = :id');
-        $query->execute(['id' => $id]);
+        foreach (['series_genre', 'series_platform', 'review', 'rating', 'watchlist'] as $table) {
+            $this->db->prepare("DELETE FROM $table WHERE series_id = :id")->execute(['id' => $id]);
+        }
+        $this->db->prepare('DELETE FROM series WHERE id = :id')->execute(['id' => $id]);
     }
 
     public function findTop(int $limit = 4): array

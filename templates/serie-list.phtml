@@ -40,7 +40,9 @@
                 $halfStar  = ($rating5 - $fullStars) >= 0.5;
                 ?>
                 <div class="serie-card">
-                    <img src="<?= $serie->getImage() ?>" alt="<?= $serie->getTitle() ?>">
+                    <div class="serie-card-img">
+                        <img src="<?= $serie->getImage() ?>" alt="<?= $serie->getTitle() ?>">
+                    </div>
                     <span class="serie-stars">
                         <?php for ($i = 0; $i < $fullStars; $i++): ?><span class="star full"></span><?php endfor; ?>
                         <?php if ($halfStar): ?><span class="star half"></span><?php endif; ?>

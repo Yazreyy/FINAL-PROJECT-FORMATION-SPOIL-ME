@@ -6,6 +6,7 @@ class AdminController extends AbstractController
     private SerieManager $sm;
     private UserManager $um;
     private ReviewManager $rm;
+    private CommentaireManager $cm;
 
 
     public function __construct()
@@ -13,6 +14,7 @@ class AdminController extends AbstractController
         $this->sm = new SerieManager();
         $this->um = new UserManager();
         $this->rm = new ReviewManager();
+        $this->cm = new CommentaireManager();
     }
 
     public function dashboard(): void
@@ -46,6 +48,7 @@ class AdminController extends AbstractController
         $this->requireAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $serie = new Serie(
                 $_POST['titre']      ?? '',
                 $_POST['synopsis']   ?? '',
@@ -66,7 +69,7 @@ class AdminController extends AbstractController
             $this->redirect('admin-series');
         }
 
-        $this->render('admin/serie-form', ['serie' => null, 'action' => 'admin-serie-add']);
+        $this->render('admin/serie-form', ['serie' => null, 'action' => 'admin-series-add']);
     }
 
     public function editSerie(int $id): void
@@ -76,6 +79,7 @@ class AdminController extends AbstractController
         $serie = $this->sm->findOne($id);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrf();
             $serie->setTitle($_POST['titre']           ?? $serie->getTitle());
             $serie->setSynopsis($_POST['synopsis']     ?? $serie->getSynopsis());
             $serie->setReleaseDate($_POST['date_sortie'] ?? $serie->getReleaseDate());
@@ -91,13 +95,14 @@ class AdminController extends AbstractController
 
         $this->render('admin/serie-form', [
             'serie'  => $serie,
-            'action' => 'admin-serie-edit&id=' . $id,
+            'action' => 'admin-series-edit&id=' . $id,
         ]);
     }
 
     public function deleteSerie(int $id): void
     {
         $this->requireAdmin();
+        $this->verifyCsrf();
         $this->sm->delete($id);
         $this->redirect('admin-series');
     }
@@ -113,6 +118,7 @@ class AdminController extends AbstractController
     public function changeRole(): void
     {
         $this->requireAdmin();
+        $this->verifyCsrf();
 
         $id   = isset($_POST['user_id']) ? (int)$_POST['user_id'] : null;
         $role = $_POST['role'] ?? null;
@@ -130,7 +136,7 @@ class AdminController extends AbstractController
     public function deleteUser(int $id): void
     {
         $this->requireAdmin();
-
+        $this->verifyCsrf();
 
         if ($id === $_SESSION['user_id']) {
             $this->redirect('admin-users');
@@ -143,10 +149,42 @@ class AdminController extends AbstractController
         $this->redirect('admin-users');
     }
 
-    public function importFromTmdb() : void {
-    // $this->requireAdmin();
+    public function manageComments(): void
+    {
+        $this->requireAdmin();
+        $comments = $this->cm->findAll();
 
-    $apiKey = '3af9fea10037a0d3bc7de800df308adb';
+        $this->render('admin/manage-comments', ['comments' => $comments]);
+    }
+
+    public function deleteComment(int $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->cm->delete($id);
+        $this->redirect('admin-comments');
+    }
+
+    public function manageReviews(): void
+    {
+        $this->requireAdmin();
+        $reviews = $this->rm->findAll();
+
+        $this->render('admin/manage-reviews', ['reviews' => $reviews]);
+    }
+
+    public function deleteReview(int $id): void
+    {
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->rm->delete($id);
+        $this->redirect('admin-reviews');
+    }
+
+    public function importFromTmdb() : void {
+    $this->requireAdmin();
+
+    $apiKey = $this->getEnv('TMDB_API_KEY');
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $url = 'https://api.themoviedb.org/3/tv/popular?api_key=' . $apiKey . '&language=fr-FR&page=' . $page;
     $response = file_get_contents($url);
@@ -198,7 +236,7 @@ class AdminController extends AbstractController
 public function refreshRatings() : void {
     $this->requireAdmin();
 
-    $apiKey = '3af9fea10037a0d3bc7de800df308adb';
+    $apiKey = $this->getEnv('TMDB_API_KEY');
     $series = $this->sm->findAll();
 
     foreach ($series as $serie) {
@@ -220,7 +258,8 @@ public function refreshRatings() : void {
 }
 
 public function importGenres() : void {
-    $apiKey = '3af9fea10037a0d3bc7de800df308adb';
+    $this->requireAdmin();
+    $apiKey = $this->getEnv('TMDB_API_KEY');
     $url = 'https://api.themoviedb.org/3/genre/tv/list?api_key=' . $apiKey . '&language=fr-FR';
     $response = file_get_contents($url);
     $data = json_decode($response, true);
@@ -236,7 +275,7 @@ public function importGenres() : void {
 public function importPlatforms() : void {
     $this->requireAdmin();
 
-    $apiKey = '3af9fea10037a0d3bc7de800df308adb';
+    $apiKey = $this->getEnv('TMDB_API_KEY');
     $url = 'https://api.themoviedb.org/3/watch/providers/tv?api_key=' . $apiKey . '&watch_region=FR&language=fr-FR';
     $response = file_get_contents($url);
     $data = json_decode($response, true);
@@ -256,7 +295,7 @@ public function importPlatforms() : void {
 public function importSeriesPlatforms() : void {
     $this->requireAdmin();
 
-    $apiKey = '3af9fea10037a0d3bc7de800df308adb';
+    $apiKey = $this->getEnv('TMDB_API_KEY');
     $series = $this->sm->findAll();
 
     $debugCount = 0;

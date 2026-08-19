@@ -12,7 +12,7 @@ protected function render(string $template, array $data = []) : void {
 
 protected function redirect(string $route) : void {
     header ("Location: /Spoil-Me/{$route}");
-    exit;
+    throw new RedirectException($route);
 }
 
 protected function isLogged() : bool {
@@ -36,6 +36,26 @@ protected function requireLogin() : void {
 protected function requireAdmin() : void {
     if(!$this->isAdmin()) {
         $this->redirect('series');
+    }
+}
+
+protected function getEnv(string $key): ?string {
+    $env = parse_ini_file(__DIR__ . '/../.env');
+    return $env[$key] ?? null;
+}
+
+protected function csrfToken() : string {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+protected function verifyCsrf() : void {
+    $expected = $_SESSION['csrf_token'] ?? '';
+    $sent = $_POST['csrf_token'] ?? '';
+    if ($expected === '' || !hash_equals($expected, $sent)) {
+        $this->redirect('');
     }
 }
 }

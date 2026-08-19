@@ -16,12 +16,17 @@ public function add(Watchlist $watchlist) : void {
         'added_at'  => $watchlist->getAddedAt(),
         'user_id'   => $watchlist->getUserId()
     ]);
-    $watchlist->setId($this->db->lastInsertId());
 }
 
-public function remove(int $id) : void {
-    $query = $this->db->prepare('DELETE FROM watchlist WHERE id = :id');
-    $query->execute(['id' => $id]);
+public function exists(int $user_id, int $series_id) : bool {
+    $query = $this->db->prepare('SELECT COUNT(*) FROM watchlist WHERE user_id = :user_id AND series_id = :series_id');
+    $query->execute(['user_id' => $user_id, 'series_id' => $series_id]);
+    return (bool)$query->fetchColumn();
+}
+
+public function remove(int $user_id, int $series_id) : void {
+    $query = $this->db->prepare('DELETE FROM watchlist WHERE user_id = :user_id AND series_id = :series_id');
+    $query->execute(['user_id' => $user_id, 'series_id' => $series_id]);
 }
 
 public function findByUser(int $user_id) : array {
@@ -30,16 +35,17 @@ public function findByUser(int $user_id) : array {
     $watchlist = [];
     foreach($query->fetchAll(PDO::FETCH_ASSOC) as $result) {
         $watchlist[] = new Watchlist($result['series_id'], $result['status'],
-            $result['added_at'], $result['id'], $result['user_id']);
+            $result['added_at'], $result['user_id']);
     }
     return $watchlist;
 }
 
 public function update(Watchlist $watchlist) : void {
-    $query = $this->db->prepare('UPDATE watchlist SET status = :status WHERE id = :id');
+    $query = $this->db->prepare('UPDATE watchlist SET status = :status WHERE user_id = :user_id AND series_id = :series_id');
     $query->execute([
-        'status' => $watchlist->getStatus(),
-        'id'     => $watchlist->getId()
+        'status'    => $watchlist->getStatus(),
+        'user_id'   => $watchlist->getUserId(),
+        'series_id' => $watchlist->getSeriesId()
     ]);
 }
 

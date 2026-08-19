@@ -1,0 +1,55 @@
+<section class="admin-dashboard">
+    <h1>Dashboard Admin</h1>
+
+    <nav class="admin-nav">
+        <a href="/Spoil-Me/?route=admin-series">Gérer les séries</a>
+        <a href="/Spoil-Me/?route=admin-users">Gérer les utilisateurs</a>
+        <a href="/Spoil-Me/?route=admin-comments">Gérer les commentaires</a>
+        <a href="/Spoil-Me/?route=admin-reviews">Gérer les critiques</a>
+        <a href="/Spoil-Me/?route=admin-import">Importer depuis TMDB</a>
+        <a href="/Spoil-Me/?route=admin-import-genres">Importer les genres</a>
+        <a href="/Spoil-Me/?route=admin-import-platforms">Importer les plateformes</a>
+        <a href="/Spoil-Me/?route=admin-refresh-ratings">Rafraîchir les notes</a>
+    </nav>
+
+
+    <div class="admin-stats">
+        <div class="stat-card">
+            <span><?= $stats['series'] ?></span>
+            <p>Séries</p>
+        </div>
+        <div class="stat-card">
+            <span><?= $stats['users'] ?></span>
+            <p>Utilisateurs</p>
+        </div>
+        <div class="stat-card">
+            <span><?= $stats['reviews'] ?></span>
+            <p>Reviews</p>
+        </div>
+    </div>
+
+
+    <h2 class="admin-section-title">Reviews récentes</h2>
+    <table class="admin-table reviews-table">
+        <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Série</th>
+                <th>Note</th>
+                <th>Contenu</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($recentReviews as $review): ?>
+                <tr>
+                    <td data-label="Utilisateur"><?= htmlspecialchars($review['username']) ?></td>
+                    <td data-label="Série"><?= htmlspecialchars($review['series_title']) ?></td>
+                    <td data-label="Note">⭐ <?= $review['note_value'] ?></td>
+                    <td class="review-content-cell" data-label="Contenu"><?= htmlspecialchars(mb_substr($review['content'], 0, 80)) ?>...</td>
+                    <td data-label="Date"><?= date('d/m/Y', strtotime($review['created_at'])) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</section>

@@ -5,8 +5,15 @@
         <p class="error"><?= $error ?></p>
     <?php endif; ?>
     <form action="/Spoil-Me/?route=check-login" method="post">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Mot de passe" required>
+        <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+        <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" name="email" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+            <label for="login-password">Mot de passe</label>
+            <input type="password" id="login-password" name="password" placeholder="Mot de passe" required>
+        </div>
         <div class="auth-form-actions">
             <button type="submit">Se connecter</button>
             <p>Pas encore de compte ? <a href="/Spoil-Me/?route=register">S'inscrire</a></p>

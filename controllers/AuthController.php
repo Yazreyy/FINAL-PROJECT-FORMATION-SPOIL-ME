@@ -11,10 +11,14 @@ public function __construct()
 }
 
 public function login() : void {
-    $this->render('login');
+    $this->render('login', [
+        'title' => 'Connexion - Spoil Me',
+        'description' => 'Connectez-vous à votre compte Spoil Me.',
+    ]);
 }
 
 public function checkLogin() : void {
+    $this->verifyCsrf();
     if(isset($_POST['email'])) {
         $email = $_POST['email']; 
 } else {$email = '';}
@@ -31,14 +35,18 @@ if($user && password_verify($password, $user->getPassword())) {
     $_SESSION['user_avatar'] = $user->getAvatarUrl();
     $this->redirect('series');
 }
-$this->render('login', ['error' => 'Email ou mot de passe incorrect.']);
+$this->render('login', ['title' => 'Connexion - Spoil Me', 'error' => 'Email ou mot de passe incorrect.']);
 }
 
 public function register() : void {
-    $this->render('register');
+    $this->render('register', [
+        'title' => 'Inscription - Spoil Me',
+        'description' => 'Créez votre compte Spoil Me pour noter et commenter vos séries préférées.',
+    ]);
 }
 
 public function checkRegister() : void {
+    $this->verifyCsrf();
     if(isset($_POST['pseudo'])) {
         $pseudo = $_POST['pseudo'];
     	} else {
@@ -56,7 +64,7 @@ public function checkRegister() : void {
     }
 
     if($this->um->findByEmail($email)) {
-        $this->render('register', ['error'=>'Cet email est déja utilisé.']);
+        $this->render('register', ['title' => 'Inscription - Spoil Me', 'error'=>'Cet email est déja utilisé.']);
         return;
     }
 
@@ -92,22 +100,75 @@ public function profile($id = null) : void {
 
     $stats = [
         'reviews'     => $rm->countByUser($userId),
-        'series_vues' => $wm->countByUserAndStatus($userId, 'vu')
+        'series_vues' => $wm->countByUserAndStatus($userId, 'terminé')
     ];
 
     $reviews = $rm->findByUser($userId);
-    $watchedSeries = $wm->findByUserAndStatut($userId, 'vu');
+    $watchedSeries = $wm->findByUserAndStatut($userId, 'terminé');
 
     $this->render('profile' , [
         'user'          => $user,
         'stats'         => $stats,
         'reviews'       => $reviews,
-        'watchedSeries' => $watchedSeries
+        'watchedSeries' => $watchedSeries,
+        'isOwnProfile'  => (int)$userId === (int)$_SESSION['user_id'],
+        'error'         => null
     ]);
+}
+
+public function updateProfile() : void {
+    $this->requireLogin();
+    $this->verifyCsrf();
+
+    $user = $this->um->findById($_SESSION['user_id']);
+
+    $username = trim($_POST['pseudo'] ?? '');
+    $email    = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    $existing = $this->um->findByEmail($email);
+    if ($existing && $existing->getId() !== $user->getId()) {
+        $rm = new ReviewManager();
+        $wm = new WatchListManager();
+        $this->render('profile', [
+            'user'          => $user,
+            'stats'         => [
+                'reviews'     => $rm->countByUser($user->getId()),
+                'series_vues' => $wm->countByUserAndStatus($user->getId(), 'terminé')
+            ],
+            'reviews'       => $rm->findByUser($user->getId()),
+            'watchedSeries' => $wm->findByUserAndStatut($user->getId(), 'terminé'),
+            'isOwnProfile'  => true,
+            'error'         => 'Cet email est déjà utilisé.'
+        ]);
+        return;
+    }
+
+    $user->setUsername($username);
+    $user->setEmail($email);
+    if ($password !== '') {
+        $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+    }
+    $this->um->update($user);
+
+    $this->redirect('profile');
+}
+
+public function deleteAccount() : void {
+    $this->requireLogin();
+    $this->verifyCsrf();
+
+    $user = $this->um->findById($_SESSION['user_id']);
+    if ($user) {
+        $this->um->delete($user);
+    }
+    session_destroy();
+    $this->redirect('login');
 }
 
 public function updateAvatar() : void {
     $this->requireLogin();
+    $this->verifyCsrf();
 
     if (!empty($_FILES['avatar']['name'])) {
         $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));

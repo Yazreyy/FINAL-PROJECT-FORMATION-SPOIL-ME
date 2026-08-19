@@ -31,6 +31,7 @@ class WatchlistController extends AbstractController
     public function addWatchlist(): void
     {
         $this->requireLogin();
+        $this->verifyCsrf();
 
         if (isset($_POST['id_serie'])) {
             $id_serie = (int)$_POST['id_serie'];
@@ -43,8 +44,10 @@ class WatchlistController extends AbstractController
             $statut = 'à voir';
         }
 
-        $entry = new Watchlist($id_serie, $statut, date('Y-m-d H:i:s'), null, $_SESSION['user_id']);
-        $this->wm->add($entry);
+        if (!$this->wm->exists($_SESSION['user_id'], $id_serie)) {
+            $entry = new Watchlist($id_serie, $statut, date('Y-m-d H:i:s'), $_SESSION['user_id']);
+            $this->wm->add($entry);
+        }
 
         $this->redirect('serie?id=' . $id_serie);
     }
@@ -53,31 +56,26 @@ class WatchlistController extends AbstractController
     {
         $this->requireLogin();
 
-        if (isset($_GET['id'])) {
-            $id = (int)$_GET['id'];
-        } else {
-            $id = 0;
-        }
         if (isset($_GET['id_serie'])) {
             $id_serie = (int)$_GET['id_serie'];
         } else {
             $id_serie = 0;
         }
 
+        $this->wm->remove($_SESSION['user_id'], $id_serie);
 
-        $this->wm->remove($id);
-
-        $this->redirect('serie?id=' . $id_serie);
+        $this->redirect('watchlist');
     }
 
     public function changeStatus(): void
     {
         $this->requireLogin();
+        $this->verifyCsrf();
 
-        if (isset($_POST['id'])) {
-            $id = (int)$_POST['id'];
+        if (isset($_POST['id_serie'])) {
+            $id_serie = (int)$_POST['id_serie'];
         } else {
-            $id = 0;
+            $id_serie = 0;
         }
         if (isset($_POST['statut'])) {
             $statut = $_POST['statut'];
@@ -85,7 +83,7 @@ class WatchlistController extends AbstractController
             $statut = 'à voir';
         }
 
-        $entry = new Watchlist(null, $statut, date('Y-m-d H:i:s'), $id);
+        $entry = new Watchlist($id_serie, $statut, date('Y-m-d H:i:s'), $_SESSION['user_id']);
         $this->wm->update($entry);
 
         $this->redirect('watchlist?statut=' . $statut);

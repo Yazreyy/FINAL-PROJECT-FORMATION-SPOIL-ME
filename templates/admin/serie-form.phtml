@@ -1,0 +1,65 @@
+<section class="admin-serie-form">
+    <h1><?= $serie ? 'Modifier une série' : 'Ajouter une série' ?></h1>
+
+    <form action="/Spoil-Me/?route=<?= $action ?>" method="post">
+        <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+
+        <div class="form-group">
+            <label>Titre</label>
+            <input type="text" name="titre" value="<?= $serie ? htmlspecialchars($serie->getTitle()) : '' ?>" required>
+        </div>
+
+        <div class="form-group">
+            <label>Synopsis</label>
+            <textarea name="synopsis"><?= $serie ? htmlspecialchars($serie->getSynopsis()) : '' ?></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Date de sortie</label>
+            <input type="date" name="date_sortie" value="<?= $serie ? $serie->getReleaseDate() : '' ?>">
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="btn-review-scroll" onclick="toggleReviewForm()">✏ Écrire une critique</button>
+            <input type="text" name="image" value="<?= $serie ? htmlspecialchars($serie->getImage()) : '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Statut</label>
+            <select name="statut">
+                <option value="en cours" <?= $serie && $serie->getStatus() === 'en cours' ? 'selected' : '' ?>>En cours</option>
+                <option value="terminée" <?= $serie && $serie->getStatus() === 'terminée' ? 'selected' : '' ?>>Terminée</option>
+                <option value="annulée" <?= $serie && $serie->getStatus() === 'annulée' ? 'selected' : '' ?>>Annulée</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>ID TMDB</label>
+            <input type="number" name="id_tmdb" value="<?= $serie ? $serie->getTmdbId() : '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Format</label>
+            <input type="text" name="format" value="<?= $serie ? htmlspecialchars($serie->getFormat() ?? '') : '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Créateur</label>
+            <input type="text" name="createur" value="<?= $serie ? htmlspecialchars($serie->getCreator() ?? '') : '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Pays</label>
+            <input type="text" name="pays" value="<?= $serie ? htmlspecialchars($serie->getCountry() ?? '') : '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Langue</label>
+            <input type="text" name="langue" value="<?= $serie ? htmlspecialchars($serie->getLanguage() ?? '') : '' ?>">
+        </div>
+
+        <button type="submit" class="btn-submit"><?= $serie ? 'Enregistrer les modifications' : 'Ajouter la série' ?></button>
+        <a href="/Spoil-Me/?route=admin-series" class="btn-cancel">Annuler</a>
+
+    </form>
+</section>

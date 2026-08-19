@@ -1,83 +1,206 @@
 <section class="serie-hero" style="background-image: url('<?= $serie->getBackdrop() ?>')">
     <div class="serie-hero-content">
         <div class="serie-hero-badges">
-            <span><?= $serie->getAverageRating() ?></span>
-            <span><?= $serie->getReleaseDate() ?></span>
-            <span><?= $plateformes[0]['name'] ?? '' ?></span>
-            <span><?= $serie->getEpisodes() ?></span>
+            <span>⭐ <?= number_format($serie->getAverageRating(), 1) ?></span>
+            <span><?= $serie->getReleaseDate() ? substr($serie->getReleaseDate(), 0, 4) : '' ?></span>
+            <?php if (!empty($plateformes[0]['name'])): ?>
+                <span><?= htmlspecialchars($plateformes[0]['name']) ?></span>
+            <?php endif; ?>
+            <?php if ($serie->getEpisodes()): ?>
+                <span><?= $serie->getEpisodes() ?> épisodes</span>
+            <?php endif; ?>
         </div>
-        <h1><?= $serie->getTitle() ?></h1>
-        <p><?= $serie->getSynopsis() ?></p>
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <form action="/Spoil-Me/?route=add-watchlist" method="post" style="display:inline">
-                <input type="hidden" name="id_serie" value="<?= $serie->getId() ?>">
-                <button type="submit">Watchlist</button>
-            </form>
-        <?php endif; ?>
-        <button>Ecrire review</button>
+        <h1><?= htmlspecialchars($serie->getTitle()) ?></h1>
+        <p class="serie-hero-synopsis"><?= htmlspecialchars($serie->getSynopsis()) ?></p>
+        <div class="serie-hero-actions">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <form action="/Spoil-Me/?route=add-watchlist" method="post" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                    <input type="hidden" name="id_serie" value="<?= $serie->getId() ?>">
+                    <button type="submit" class="btn-watchlist">+ Ma liste</button>
+                </form>
+            <?php endif; ?>
+            <button type="button" class="btn-review-scroll" onclick="toggleReviewForm()">✏ Écrire une critique</button>
+        </div>
     </div>
 </section>
 
-<section>
-    <nav>
-        <ul>
-            <li>Critiques</li>
-            <li>Casting</li>
-            <li>Saisons</li>
-            <li>Théories</li>
-        </ul>
-    </nav>
-</section>
+<nav class="serie-tabs">
+    <a href="#critiques">Critiques</a>
+    <a href="#casting">Casting</a>
+</nav>
 
 <section class="serie-body">
-    <div class="serie-main">
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <form action="/Spoil-Me/?route=review-add" method="post" class="review-form">
-                <input type="hidden" name="id_serie" value="<?= $serie->getId() ?>">
-                <select name="note" required>
-                    <option value="">Note...</option>
-                    <option value="1">1 ⭐</option>
-                    <option value="2">2 ⭐</option>
-                    <option value="3">3 ⭐</option>
-                    <option value="4">4 ⭐</option>
-                    <option value="5">5 ⭐</option>
-                </select>
-                <textarea name="texte" placeholder="Écrire une critique..." required></textarea>
-                <button type="submit">Publier</button>
-            </form>
-        <?php endif; ?>
 
-        <?php foreach ($reviews as $review): ?>
-            <div class="review-card">
-                <div class="review-header">
-                    <img src="<?= $review['avatar'] ?>" alt="">
-                    <div>
-                        <span class="review-username"><?= $review['username'] ?></span>
+    <div class="serie-main">
+
+        <div id="critiques" class="serie-section">
+            <h2 class="serie-section-title">Critiques</h2>
+
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <form action="/Spoil-Me/?route=review-add" method="post" class="review-form" id="review-form">
+                    <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                    <input type="hidden" name="id_serie" value="<?= $serie->getId() ?>">
+                    <select name="note" required>
+                        <option value="">Note...</option>
+                        <option value="1">1 ⭐</option>
+                        <option value="2">2 ⭐</option>
+                        <option value="3">3 ⭐</option>
+                        <option value="4">4 ⭐</option>
+                        <option value="5">5 ⭐</option>
+                    </select>
+                    <textarea name="texte" placeholder="Écrire une critique..." required></textarea>
+                    <button type="submit">Publier</button>
+                </form>
+            <?php endif; ?>
+
+            <?php foreach ($reviews as $review): ?>
+                <div class="review-card">
+                    <div class="review-header">
+                        <a href="/Spoil-Me/?route=profile&id=<?= $review['user_id'] ?>">
+                            <img src="<?= $review['avatar'] ?>" alt="">
+                        </a>
+                        <div>
+                            <a class="review-username" href="/Spoil-Me/?route=profile&id=<?= $review['user_id'] ?>"><?= htmlspecialchars($review['username']) ?></a>
+                            <span class="review-date"><?= date('d/m/Y', strtotime($review['created_at'])) ?></span>
+                        </div>
+                        <?php if (!empty($review['note_value'])): ?>
+                            <span class="review-meta"><?= str_repeat('⭐', (int)$review['note_value']) ?></span>
+                        <?php endif; ?>
                     </div>
-                    <?php if (!empty($review['note_value'])): ?>
-                        <span class="review-meta"><?= str_repeat('⭐', (int)$review['note_value']) ?></span>
+                    <p class="review-content"><?= htmlspecialchars($review['content']) ?></p>
+                    <div class="review-footer">
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <form action="/Spoil-Me/?route=like-review" method="post" class="like-form" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                                <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                                <input type="hidden" name="serie_id" value="<?= $serie->getId() ?>">
+                                <button type="submit" class="btn-like <?= $review['user_liked'] ? 'liked' : '' ?>">
+                                    ♥ <?= $review['likes_count'] ?? 0 ?>
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            <span class="btn-like">♥ <?= $review['likes_count'] ?? 0 ?></span>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if (!empty($comments[$review['id']])): ?>
+                        <div class="review-comments">
+                            <?php foreach ($comments[$review['id']] as $comment): ?>
+                                <div class="comment-item">
+                                    <img src="<?= $comment['avatar'] ?>" alt="">
+                                    <div>
+                                        <span class="comment-username"><?= htmlspecialchars($comment['username']) ?></span>
+                                        <p><?= htmlspecialchars($comment['content']) ?></p>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     <?php endif; ?>
-                    <span class="review-date"><?= $review['created_at'] ?></span>
+
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <form action="/Spoil-Me/?route=comment-add" method="post" class="comment-form">
+                            <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                            <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                            <input type="hidden" name="serie_id" value="<?= $serie->getId() ?>">
+                            <input type="text" name="content" placeholder="Répondre..." required>
+                            <button type="submit">Envoyer</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
-                <p class="review-content"><?= $review['content'] ?></p>
-                <div class="review-footer">
-                    <span>♥ <?= $review['likes_count'] ?? 0 ?></span>
+            <?php endforeach; ?>
+
+            <?php if (empty($reviews)): ?>
+                <p class="no-reviews">Aucune critique pour le moment. Sois le premier !</p>
+            <?php endif; ?>
+        </div>
+
+        <div id="casting" class="serie-section">
+            <h2 class="serie-section-title">Casting</h2>
+            <div class="casting-grid">
+                <?php foreach (array_slice($casting, 0, 8) as $acteur): ?>
+                    <div class="casting-card">
+                        <?php if ($acteur['profile_path']): ?>
+                            <img src="https://image.tmdb.org/t/p/w200<?= $acteur['profile_path'] ?>" alt="">
+                        <?php else: ?>
+                            <div class="casting-no-photo">?</div>
+                        <?php endif; ?>
+                        <h3><?= htmlspecialchars($acteur['name']) ?></h3>
+                        <p><?= htmlspecialchars($acteur['character']) ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+    </div>
+
+    <aside class="serie-aside">
+
+        <div class="aside-block">
+            <h3>Infos</h3>
+            <ul class="aside-infos">
+                <?php if ($serie->getStatus()): ?>
+                    <li><span>Statut</span><strong><?= htmlspecialchars($serie->getStatus()) ?></strong></li>
+                <?php endif; ?>
+                <?php if ($serie->getSaisons()): ?>
+                    <li><span>Saisons</span><strong><?= $serie->getSaisons() ?></strong></li>
+                <?php endif; ?>
+                <?php if ($serie->getEpisodes()): ?>
+                    <li><span>Épisodes</span><strong><?= $serie->getEpisodes() ?></strong></li>
+                <?php endif; ?>
+                <?php if ($serie->getCreator()): ?>
+                    <li><span>Créateur</span><strong><?= htmlspecialchars($serie->getCreator()) ?></strong></li>
+                <?php endif; ?>
+                <?php if ($serie->getCountry()): ?>
+                    <li><span>Pays</span><strong><?= htmlspecialchars($serie->getCountry()) ?></strong></li>
+                <?php endif; ?>
+                <?php if ($serie->getLanguage()): ?>
+                    <li><span>Langue</span><strong><?= strtoupper($serie->getLanguage()) ?></strong></li>
+                <?php endif; ?>
+                <?php if ($serie->getFormat()): ?>
+                    <li><span>Format</span><strong><?= htmlspecialchars($serie->getFormat()) ?></strong></li>
+                <?php endif; ?>
+            </ul>
+        </div>
+
+        <?php if (!empty($plateformes)): ?>
+            <div class="aside-block">
+                <h3>Disponible sur</h3>
+                <div class="aside-platforms">
+                    <?php foreach ($plateformes as $p): ?>
+                        <span class="platform-badge"><?= htmlspecialchars($p['name']) ?></span>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        <?php endforeach; ?>
-    </div>
-    <div class="serie-aside">
+        <?php endif; ?>
 
-    </div>
+        <?php if (!empty($similaires)): ?>
+            <div class="aside-block">
+                <h3>Séries similaires</h3>
+                <div class="aside-similaires">
+                    <?php foreach ($similaires as $sim): ?>
+                        <a href="/Spoil-Me/?route=serie&id=<?= $sim->getId() ?>" class="similaire-card">
+                            <img src="<?= $sim->getImage() ?>" alt="">
+                            <span><?= htmlspecialchars($sim->getTitle()) ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+    </aside>
+
 </section>
 
-<section class="casting">
-    <?php foreach (array_slice($casting, 0, 8) as $acteur): ?>
-        <div>
-            <img src="https://image.tmdb.org/t/p/w200<?= $acteur['profile_path'] ?>" alt="">
-            <h3><?= $acteur['name'] ?></h3>
-            <p><?= $acteur['character'] ?></p>
-        </div>
-    <?php endforeach; ?>
-
-</section>
+<script>
+function toggleReviewForm() {
+    const form = document.getElementById('review-form');
+    if (!form) return;
+    const isHidden = form.style.display === 'none' || form.style.display === '';
+    form.style.display = isHidden ? 'flex' : 'none';
+    form.style.flexDirection = 'column';
+    if (isHidden) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+</script>

@@ -32,4 +32,12 @@ public function exists(int $user_id, int $review_id) : bool {
     ]);
     return (bool)$query->fetchColumn();
 }
+
+public function count(int $review_id) : int {
+    $query = $this->db->prepare('SELECT COUNT(*) FROM user_like WHERE review_id = :review_id');
+    $query->execute([
+        'review_id' => $review_id
+    ]);
+    return (int)$query->fetchColumn();
+}
 }

@@ -15,7 +15,7 @@ class SerieController extends AbstractController
     {
         $topSeries = $this->sm->findTop(4);
         $rm = new ReviewManager();
-        $recentReviews = $rm->findRecent(5);
+        $recentReviews = $rm->findRecent(5, $_SESSION['user_id'] ?? null);
         $um = new UserManager();
         $vipMembers = $um->findVip(3);
         $stats = [
@@ -25,6 +25,8 @@ class SerieController extends AbstractController
         ];
 
         $this->render('home', [
+            'title' => 'Spoil Me - Découvrez, notez et débattez de vos séries',
+            'description' => 'Spoil Me - la plateforme francophone pour découvrir, noter et débattre de vos séries préférées.',
             'topSeries' => $topSeries,
             'recentReviews' => $recentReviews,
             'vipMembers' => $vipMembers,
@@ -62,6 +64,8 @@ class SerieController extends AbstractController
         $genres = $this->sm->findAllGenres();
 
         $this->render('serie-list', [
+            'title' => 'Toutes les séries - Spoil Me',
+            'description' => 'Parcourez et filtrez toutes les séries disponibles sur Spoil Me par genre, plateforme ou titre.',
             'series'      => $series,
             'genres' => $genres,
             'plateformes' => $plateformes,
@@ -78,7 +82,8 @@ class SerieController extends AbstractController
         $plateformes = $this->sm->findPlateformes($id);
         $similaires  = $this->sm->findSimilar($id);
 
-        $url = 'https://api.themoviedb.org/3/tv/' . $serie->getTmdbId() . '/credits?api_key=3af9fea10037a0d3bc7de800df308adb&language=fr-FR';
+        $apiKey = $this->getEnv('TMDB_API_KEY');
+        $url = 'https://api.themoviedb.org/3/tv/' . $serie->getTmdbId() . '/credits?api_key=' . $apiKey . '&language=fr-FR';
         $response = file_get_contents($url);
         $casting = json_decode($response, true)['cast'] ?? [];
 
@@ -88,11 +93,20 @@ class SerieController extends AbstractController
             $sort = 'recent';
         }
 
-        $reviews = $rm->findBySerie($id, $sort);
+        $reviews = $rm->findBySerie($id, $sort, $_SESSION['user_id'] ?? null);
+
+        $cm = new CommentaireManager();
+        $comments = [];
+        foreach ($reviews as $review) {
+            $comments[$review['id']] = $cm->findByReview($review['id']);
+        }
 
         $this->render('serie-detail', [
+            'title' => $serie->getTitle() . ' - Spoil Me',
+            'description' => mb_substr($serie->getSynopsis(), 0, 155),
             'serie'       => $serie,
             'reviews'     => $reviews,
+            'comments'    => $comments,
             'plateformes' => $plateformes,
             'similaires'  => $similaires,
             'casting'     => $casting,
@@ -102,7 +116,7 @@ class SerieController extends AbstractController
 
     public function tendances(): void
     {
-        $apiKey = '3af9fea10037a0d3bc7de800df308adb';
+        $apiKey = $this->getEnv('TMDB_API_KEY');
         $series = $this->sm->findOnGoing(60);
         $feed = [];
         $rm = new ReviewManager();
@@ -135,6 +149,11 @@ class SerieController extends AbstractController
             }
         }
 
-        $this->render('tendances', ['feed' => $feed, 'recentReviews' => $recentReviews]);
+        $this->render('tendances', [
+            'title' => 'Tendances - Spoil Me',
+            'description' => 'Suivez les dernières actualités des séries en cours : nouveaux épisodes, saisons et productions.',
+            'feed' => $feed,
+            'recentReviews' => $recentReviews
+        ]);
     }
 }

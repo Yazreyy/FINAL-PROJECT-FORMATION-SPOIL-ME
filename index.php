@@ -5,4 +5,9 @@ session_start();
 require_once 'autoload.php';
 
 $router = new Router();
-$router->handleRequest($_GET);
+
+try {
+    $router->handleRequest($_GET);
+} catch (RedirectException $e) {
+    exit;
+}

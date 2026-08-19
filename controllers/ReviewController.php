@@ -13,6 +13,7 @@ public function __construct()
 
 public function add() : void{
     $this->requireLogin();
+    $this->verifyCsrf();
 
     if(isset($_POST['texte'])) {$texte = $_POST['texte'];} else {$texte = '';}
     if (isset($_POST['id_serie'])) {$id_serie = (int)$_POST['id_serie'];} else {$id_serie = 0;}
@@ -36,6 +37,7 @@ public function add() : void{
 
 public function delete() : void {
     $this->requireLogin();
+    $this->verifyCsrf();
 
     if(isset($_GET['id'])) {$id = (int)$_GET['id'];} else {$id = 0;}
     if(isset($_GET['id_serie'])) {$id_serie = (int)$_GET['id_serie'];} else {$id_serie = 0;}

@@ -6,8 +6,7 @@
             Rejoignez la communauté francophone la plus<br>
             passionnée.</p>
         <div class="hero-buttons">
-            <button class="btn-primary">▶ Commencer l'exploration</button>
-            <button class="btn-secondary">🔍 Recherche avancée</button>
+            <a href="/Spoil-Me/?route=series" class="btn-primary">▶ Commencer l'exploration</a>
         </div>
     </div>
     <div class="hero-right">
@@ -23,7 +22,7 @@
                     <div class="hero-tags">
                         <span>Sci-Fi</span>
                         <span>Drama</span>
-                        <button class="btn-fiche">Voir la fiche →</button>
+                        <a href="/Spoil-Me/?route=serie&id=<?= $topSeries[0]->getId() ?>" class="btn-fiche">Voir la fiche →</a>
                     </div>
                 </div>
             </div>
@@ -36,10 +35,12 @@
     <div class="top-grid">
         <?php foreach ($topSeries as $index => $serie): ?>
             <div class="top-card">
+                <a href="/Spoil-Me/?route=serie&id=<?= $serie->getId() ?>">
                 <div class="top-card-img" style="background-image: url('<?= $serie->getImage() ?>')">
                     <span class="top-badge">TOP <?= $index + 1 ?></span>
                     <h3><?= $serie->getTitle() ?></h3>
                 </div>
+                </a>
                 <div class="top-card-body">
                     <span>⭐ <?= $serie->getAverageRating() ?></span>
                     <p><?= $serie->getSynopsis() ?></p>
@@ -48,7 +49,6 @@
             </div>
         <?php endforeach; ?>
     </div>
-    <a href="/?route=series">Voir tout le classement →</a>
 </section>
 <section class="recent-reviews">
     <h2>ACTIVITÉ DE LA <span>COMMUNAUTÉ</span></h2>
@@ -60,18 +60,39 @@
                 <?php foreach ($recentReviews as $review): ?>
                     <div class="review-card">
                         <div class="review-header">
-                            <img src="<?= $review['avatar'] ?>" alt="">
+                            <a href="/Spoil-Me/?route=profile&id=<?= $review['user_id'] ?>">
+                                <img src="<?= $review['avatar'] ?>" alt="">
+                            </a>
                             <div>
-                                <span class="review-username"><?= $review['username'] ?></span>
-                                <span class="review-meta">A noté <strong><?= $review['series_title'] ?></strong> <?= str_repeat('⭐', (int)($review['note_value'] ?? 0)) ?></span>
+                                <a class="review-username" href="/Spoil-Me/?route=profile&id=<?= $review['user_id'] ?>"><?= $review['username'] ?></a>
+                                <span class="review-meta">A noté <a href="/Spoil-Me/?route=serie&id=<?= $review['series_id'] ?>"><strong><?= $review['series_title'] ?></strong></a> <?= str_repeat('⭐', (int)($review['note_value'] ?? 0)) ?></span>
                             </div>
                             <span class="review-date"><?= $review['created_at'] ?></span>
                         </div>
-                        <p class="review-content"><?= $review['content'] ?></p>
+                        <p class="review-content"><?= htmlspecialchars($review['content']) ?></p>
                         <div class="review-footer">
-                            <span>♥ <?= $review['likes_count'] ?? 0 ?></span>
-                            <span>💬 réponses</span>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <form action="/Spoil-Me/?route=like-review" method="post" class="like-form" style="display:inline">
+                                    <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                                    <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                                    <input type="hidden" name="serie_id" value="<?= $review['series_id'] ?>">
+                                    <input type="hidden" name="redirect" value="home">
+                                    <button type="submit" class="btn-like <?= $review['user_liked'] ? 'liked' : '' ?>">♥ <?= $review['likes_count'] ?? 0 ?></button>
+                                </form>
+                            <?php else: ?>
+                                <span>♥ <?= $review['likes_count'] ?? 0 ?></span>
+                            <?php endif; ?>
                         </div>
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <form action="/Spoil-Me/?route=comment-add" method="post" class="comment-form">
+                                <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                                <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
+                                <input type="hidden" name="serie_id" value="<?= $review['series_id'] ?>">
+                                <input type="hidden" name="redirect" value="home">
+                                <input type="text" name="content" placeholder="Répondre..." required>
+                                <button type="submit">Envoyer</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>

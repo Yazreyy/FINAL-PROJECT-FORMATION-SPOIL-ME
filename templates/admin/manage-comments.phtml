@@ -1,0 +1,33 @@
+<section class="admin-manage-users">
+    <div class="admin-header">
+        <h1>Gestion des commentaires</h1>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Série</th>
+                <th>Contenu</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($comments as $comment): ?>
+                <tr>
+                    <td><?= htmlspecialchars($comment['username']) ?></td>
+                    <td><a href="/Spoil-Me/?route=serie&id=<?= $comment['series_id'] ?>"><?= htmlspecialchars($comment['series_title']) ?></a></td>
+                    <td><?= htmlspecialchars($comment['content']) ?></td>
+                    <td><?= date('d/m/Y', strtotime($comment['created_at'])) ?></td>
+                    <td>
+                        <form action="/Spoil-Me/?route=admin-comment-delete&id=<?= $comment['id'] ?>" method="post" onsubmit="return confirm('Supprimer ce commentaire ?')" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</section>

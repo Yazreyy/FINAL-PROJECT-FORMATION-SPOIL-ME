@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spoil Me</title>
+    <title><?= htmlspecialchars($title ?? 'Spoil Me') ?></title>
+    <meta name="description" content="<?= htmlspecialchars($description ?? 'Spoil Me - découvrez, notez et débattez de vos séries préférées avec la communauté francophone.') ?>">
     <link rel="stylesheet" href="/Spoil-Me/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
@@ -13,15 +14,18 @@
     <header>
         <div class="header">
             <a href="/Spoil-Me/"><img src="/Spoil-Me/assets/img/logo.png" alt="logo-spoil-me"></a>
-            <div class="liste">
+            <div class="liste" id="nav-menu">
                 <a href="/Spoil-Me/">Accueil</a>
                 <a href="/Spoil-Me/?route=series">Series</a>
                 <a href="/Spoil-Me/?route=watchlist">Watchlist</a>
                 <a href="/Spoil-Me/?route=tendances">Tendances</a>
             </div>
             <div class="droite">
-                <button class="btn"></button>
+                <button type="button" class="btn-burger" id="burger-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu">☰</button>
                 <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                        <a href="/Spoil-Me/?route=admin" class="btn-admin">Admin</a>
+                    <?php endif; ?>
                     <a href="/Spoil-Me/?route=profile" class="nav-avatar">
                         <img src="<?= $_SESSION['user_avatar'] ?? 'uploads/avatar/default.jpg' ?>" alt="Mon profil">
                     </a>
@@ -72,6 +76,7 @@
             <p>&copy; <?= date('Y') ?> Spoil Me. Tous droits réservés.</p>
         </div>
     </footer>
+    <script src="/Spoil-Me/assets/js/main.js?v=<?= filemtime(__DIR__ . '/../assets/js/main.js') ?>" defer></script>
 </body>
 
 </html>

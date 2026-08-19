@@ -5,12 +5,45 @@
             <h1><?= $user->getUsername() ?></h1>
             <span class="profile-role"><?= $user->getRole() ?></span>
             <p>Membre depuis le <?= $user->getCreatedAt() ?></p>
-            <form action="/Spoil-Me/?route=update-avatar" method="post" enctype="multipart/form-data" class="avatar-form">
-                <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none" onchange="this.form.submit()">
-                <button type="button" onclick="document.getElementById('avatar-input').click()">Changer la photo</button>
-            </form>
+            <?php if ($isOwnProfile): ?>
+                <form action="/Spoil-Me/?route=update-avatar" method="post" enctype="multipart/form-data" class="avatar-form">
+                    <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none" onchange="this.form.submit()">
+                    <button type="button" onclick="document.getElementById('avatar-input').click()">Changer la photo</button>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
+
+    <?php if ($isOwnProfile): ?>
+        <div class="profile-edit">
+            <h3>Modifier mon profil</h3>
+            <?php if (!empty($error)): ?>
+                <p class="error"><?= $error ?></p>
+            <?php endif; ?>
+            <form action="/Spoil-Me/?route=update-profile" method="post">
+                <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                <div class="form-group">
+                    <label>Pseudo</label>
+                    <input type="text" name="pseudo" value="<?= htmlspecialchars($user->getUsername()) ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="<?= htmlspecialchars($user->getEmail()) ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Nouveau mot de passe</label>
+                    <input type="password" name="password" placeholder="Laisser vide pour ne pas changer">
+                </div>
+                <button type="submit" class="btn-submit">Enregistrer les modifications</button>
+            </form>
+
+            <form action="/Spoil-Me/?route=delete-account" method="post" onsubmit="return confirm('Supprimer définitivement ton compte ? Cette action est irréversible.');" class="delete-account-form">
+                <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                <button type="submit" class="btn-delete-account">Supprimer mon compte</button>
+            </form>
+        </div>
+    <?php endif; ?>
 
     <div class="stats-block">
         <h3>Statistiques</h3>
@@ -32,10 +65,15 @@
                             </div>
                             <span class="review-date"><?= $review['created_at'] ?></span>
                         </div>
-                        <p class="review-content"><?= $review['content'] ?></p>
-                        <div class="review-footer">
-                            <a href="/Spoil-Me/?route=review-delete&id=<?= $review['id'] ?>&id_serie=<?= $review['series_id'] ?>&redirect=profile">Supprimer</a>
-                        </div>
+                        <p class="review-content"><?= htmlspecialchars($review['content']) ?></p>
+                        <?php if ($isOwnProfile): ?>
+                            <div class="review-footer">
+                                <form action="/Spoil-Me/?route=review-delete&id=<?= $review['id'] ?>&id_serie=<?= $review['series_id'] ?>&redirect=profile" method="post" style="display:inline">
+                                    <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                                    <button type="submit">Supprimer</button>
+                                </form>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -49,7 +87,9 @@
                 <?php foreach ($watchedSeries as $item): ?>
                     <a href="/Spoil-Me/?route=serie&id=<?= $item['series_id'] ?>">
                         <div class="serie-card">
-                            <img src="<?= $item['image'] ?>" alt="">
+                            <div class="serie-card-img">
+                                <img src="<?= $item['image'] ?>" alt="">
+                            </div>
                             <h3><?= $item['title'] ?></h3>
                         </div>
                     </a>

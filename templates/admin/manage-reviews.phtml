@@ -1,0 +1,33 @@
+<section class="admin-manage-users">
+    <div class="admin-header">
+        <h1>Gestion des critiques</h1>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Série</th>
+                <th>Contenu</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($reviews as $review): ?>
+                <tr>
+                    <td><?= htmlspecialchars($review['username']) ?></td>
+                    <td><a href="/Spoil-Me/?route=serie&id=<?= $review['series_id'] ?>"><?= htmlspecialchars($review['series_title']) ?></a></td>
+                    <td><?= htmlspecialchars($review['content']) ?></td>
+                    <td><?= date('d/m/Y', strtotime($review['created_at'])) ?></td>
+                    <td>
+                        <form action="/Spoil-Me/?route=admin-review-delete&id=<?= $review['id'] ?>" method="post" onsubmit="return confirm('Supprimer cette critique ?')" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</section>

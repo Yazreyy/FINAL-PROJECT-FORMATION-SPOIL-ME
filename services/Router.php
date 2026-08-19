@@ -3,101 +3,106 @@
 class Router
 {
 
-    private AuthController $ac;
-    private SerieController $sc;
-    private WatchlistController $wc;
-    private ReviewController $rc;
-    private AdminController $adc;
-
-    public function __construct()
-    {
-        $this->ac = new AuthController();
-        $this->sc = new SerieController();
-        $this->wc = new WatchlistController();
-        $this->rc = new ReviewController();
-        $this->adc = new AdminController();
-    }
-
     public function handleRequest(array $get): void
     {
         if (!isset($get['route'])) {
-            $this->sc->home();
+            (new SerieController())->home();
         } else if ($get['route'] === 'login') {
-            $this->ac->login();
+            (new AuthController())->login();
         } else if ($get['route'] === 'check-login') {
-            $this->ac->checklogin();
+            (new AuthController())->checklogin();
         } else if ($get['route'] === 'register') {
-            $this->ac->register();
+            (new AuthController())->register();
         } else if ($get['route'] === 'check-register') {
-            $this->ac->checkRegister();
+            (new AuthController())->checkRegister();
         } else if ($get['route'] === 'logout') {
-            $this->ac->logout();
+            (new AuthController())->logout();
         } else if ($get['route'] === 'series') {
-            $this->sc->index();
+            (new SerieController())->index();
         }else if ($get['route'] === 'tendances') {
-            $this->sc->tendances();}
+            (new SerieController())->tendances();}
             else if ($get['route'] === 'serie') {
             if (isset($get['id'])) {
-                $this->sc->show($get['id']);
+                (new SerieController())->show($get['id']);
             } else {
-                $this->sc->home();
+                (new SerieController())->home();
             }
+        } else if ($get['route'] === 'like-review') {
+            (new LikeController())->toggle();
+        } else if ($get['route'] === 'comment-add') {
+            (new CommentaireController())->add();
         } else if ($get['route'] === 'review-add') {
-            $this->rc->add();
+            (new ReviewController())->add();
         } else if ($get['route'] === 'review-delete') {
-            $this->rc->delete();
+            (new ReviewController())->delete();
         } else if ($get['route'] === 'watchlist') {
-            $this->wc->index();
+            (new WatchlistController())->index();
         } else if ($get['route'] === 'add-watchlist') {
-            $this->wc->addWatchlist();
+            (new WatchlistController())->addWatchlist();
         } else if ($get['route'] === 'remove-watchlist') {
-            $this->wc->removeWatchlist();
+            (new WatchlistController())->removeWatchlist();
         } else if ($get['route'] === 'watchlist-status') {
-            $this->wc->changeStatus();
+            (new WatchlistController())->changeStatus();
         } else if ($get['route'] === 'update-avatar') {
-            $this->ac->updateAvatar();
+            (new AuthController())->updateAvatar();
+        } else if ($get['route'] === 'update-profile') {
+            (new AuthController())->updateProfile();
+        } else if ($get['route'] === 'delete-account') {
+            (new AuthController())->deleteAccount();
         } else if ($get['route'] === 'profile') {
             if (isset($get['id'])) {
-                $this->ac->profile($get['id']);
+                (new AuthController())->profile($get['id']);
             } else {
-                $this->ac->profile();
+                (new AuthController())->profile();
             }
         } else if ($get['route'] === 'admin') {
-            $this->adc->dashboard();
+            (new AdminController())->dashboard();
         } else if ($get['route'] === 'admin-series') {
-            $this->adc->manageSeries();
+            (new AdminController())->manageSeries();
         } else if ($get['route'] === 'admin-series-add') {
-            $this->adc->addSerie();
+            (new AdminController())->addSerie();
         } else if ($get['route'] === 'admin-series-edit') {
             if (isset($get['id'])) {
-                $this->adc->editSerie((int)$get['id']);
+                (new AdminController())->editSerie((int)$get['id']);
             } else {
-                $this->adc->manageSeries();
+                (new AdminController())->manageSeries();
             }
         } else if ($get['route'] === 'admin-series-delete') {
             if (isset($get['id'])) {
-                $this->adc->deleteSerie((int)$get['id']);
+                (new AdminController())->deleteSerie((int)$get['id']);
             }
         } else if ($get['route'] === 'admin-users') {
-            $this->adc->manageUsers();
+            (new AdminController())->manageUsers();
         } else if ($get['route'] === 'admin-user-role') {
-            $this->adc->changeRole();
+            (new AdminController())->changeRole();
         } else if ($get['route'] === 'admin-user-delete') {
             if (isset($get['id'])) {
-                $this->adc->deleteUser((int)$get['id']);
+                (new AdminController())->deleteUser((int)$get['id']);
+            }
+        } else if ($get['route'] === 'admin-comments') {
+            (new AdminController())->manageComments();
+        } else if ($get['route'] === 'admin-comment-delete') {
+            if (isset($get['id'])) {
+                (new AdminController())->deleteComment((int)$get['id']);
+            }
+        } else if ($get['route'] === 'admin-reviews') {
+            (new AdminController())->manageReviews();
+        } else if ($get['route'] === 'admin-review-delete') {
+            if (isset($get['id'])) {
+                (new AdminController())->deleteReview((int)$get['id']);
             }
         } else if ($get['route'] === 'admin-import') {
-            $this->adc->importFromTmdb();
+            (new AdminController())->importFromTmdb();
         } else if ($get['route'] === 'admin-import-genres') {
-            $this->adc->importGenres();
+            (new AdminController())->importGenres();
         } else if ($get['route'] === 'admin-import-platforms') {
-            $this->adc->importPlatforms();
+            (new AdminController())->importPlatforms();
         } else if ($get['route'] === 'admin-import-series-platforms') {
-            $this->adc->importSeriesPlatforms();
+            (new AdminController())->importSeriesPlatforms();
         } else if ($get['route'] === 'admin-refresh-ratings') {
-            $this->adc->refreshRatings();
+            (new AdminController())->refreshRatings();
         } else {
-            $this->sc->home();
+            (new SerieController())->home();
         }
     }
 }

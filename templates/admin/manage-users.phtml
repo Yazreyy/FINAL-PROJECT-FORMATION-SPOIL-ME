@@ -1,0 +1,49 @@
+<section class="admin-manage-users">
+    <div class="admin-header">
+        <h1>Gestion des utilisateurs</h1>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Avatar</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Inscrit le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><img src="/Spoil-Me/<?= $user->getAvatarUrl() ?>" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:50%;"></td>
+                    <td><?= htmlspecialchars($user->getUsername()) ?></td>
+                    <td><?= htmlspecialchars($user->getEmail()) ?></td>
+                    <td>
+                        <form action="/Spoil-Me/?route=admin-user-role" method="post" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                            <input type="hidden" name="user_id" value="<?= $user->getId() ?>">
+                            <select name="role" onchange="this.form.submit()">
+                                <option value="user" <?= $user->getRole() === 'user' ? 'selected' : '' ?>>user</option>
+                                <option value="vip" <?= $user->getRole() === 'vip' ? 'selected' : '' ?>>vip</option>
+                                <option value="admin" <?= $user->getRole() === 'admin' ? 'selected' : '' ?>>admin</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td><?= $user->getCreatedAt() ?></td>
+                    <td>
+                        <?php if ($user->getId() !== $_SESSION['user_id']): ?>
+                            <form action="/Spoil-Me/?route=admin-user-delete&id=<?= $user->getId() ?>" method="post" onsubmit="return confirm('Supprimer cet utilisateur ?')" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="<?= $this->csrfToken() ?>">
+                                <button type="submit">Supprimer</button>
+                            </form>
+                        <?php else: ?>
+                            <span>—</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</section>

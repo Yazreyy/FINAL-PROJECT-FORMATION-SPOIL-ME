@@ -6,7 +6,8 @@ protected PDO $db;
 
 public function __construct()
 {   
-    $env = parse_ini_file(__DIR__ . '/../.env');
+    $envFile = getenv('APP_ENV') === 'testing' ? '.env.testing' : '.env';
+    $env = parse_ini_file(__DIR__ . '/../' . $envFile);
     
     $this->db = new PDO(
         "mysql:host={$env['DB_HOST']};dbname={$env['DB_NAME']};charset=utf8",

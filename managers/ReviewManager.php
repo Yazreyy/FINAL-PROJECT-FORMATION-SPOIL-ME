@@ -51,20 +51,36 @@ public function findOne(int $id) : ?Review {
     );
 }
 
-public function findRecent(int $limit = 5) : array {
+public function findRecent(int $limit = 5, ?int $user_id = null) : array {
     $query = $this->db->prepare('
         SELECT review.*, user.username, user.avatar,
                series.title AS series_title, series.image AS series_image,
-               rating.value AS note_value
+               rating.value AS note_value,
+               COUNT(DISTINCT ul.id) AS likes_count,
+               SUM(CASE WHEN ul.user_id = :user_id THEN 1 ELSE 0 END) AS user_liked
         FROM review
         JOIN user ON review.user_id = user.id
         JOIN series ON review.series_id = series.id
         LEFT JOIN rating ON rating.user_id = review.user_id AND rating.series_id = review.series_id
+        LEFT JOIN user_like ul ON ul.review_id = review.id
+        GROUP BY review.id
         ORDER BY review.created_at DESC
         LIMIT :limit
     ');
+    $query->bindValue('user_id', $user_id);
     $query->bindValue('limit', $limit, PDO::PARAM_INT);
     $query->execute();
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function findAll() : array {
+    $query = $this->db->query('
+        SELECT review.*, user.username, series.title AS series_title, series.id AS series_id
+        FROM review
+        JOIN user ON review.user_id = user.id
+        JOIN series ON review.series_id = series.id
+        ORDER BY review.created_at DESC
+    ');
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -94,21 +110,22 @@ public function findByUser(int $user_id) : array {
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
-public function findBySerie(int $series_id, string $sort = 'recent') : array {
+public function findBySerie(int $series_id, string $sort = 'recent', ?int $user_id = null) : array {
     $orderBy = $sort === 'likes' ? 'likes_count DESC' : 'review.created_at DESC';
     $query = $this->db->prepare("
         SELECT review.*, user.username, user.avatar,
                rating.value AS note_value,
-               COUNT(user_like.id) AS likes_count
+               COUNT(DISTINCT ul.id) AS likes_count,
+               SUM(CASE WHEN ul.user_id = :user_id THEN 1 ELSE 0 END) AS user_liked
         FROM review
         JOIN user ON review.user_id = user.id
-        LEFT JOIN user_like ON user_like.review_id = review.id
+        LEFT JOIN user_like ul ON ul.review_id = review.id
         LEFT JOIN rating ON rating.user_id = review.user_id AND rating.series_id = review.series_id
         WHERE review.series_id = :series_id
         GROUP BY review.id
         ORDER BY $orderBy
     ");
-    $query->execute(['series_id' => $series_id]);
+    $query->execute(['series_id' => $series_id, 'user_id' => $user_id]);
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 }
