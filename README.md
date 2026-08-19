@@ -13,7 +13,7 @@ PHP orienté objet, architecture MVC construite sans framework.</p>
 
 <p><a href="https://spoil-me.alwaysdata.net/Spoil-Me/"><strong>Voir la démo</strong></a></p>
 
-<img src="https://github.com/user-attachments/assets/54ec8904-2d72-47bd-9c6c-cdcfae03d38c" width="800">
+<img src="https://github.com/user-attachments/assets/54ec8904-2d72-47bd-9c6c-cdcfae03d38c" width="600">
 
 </div>
 
@@ -27,10 +27,7 @@ PHP orienté objet, architecture MVC construite sans framework.</p>
 - Comptes utilisateurs (inscription, connexion, sessions)
 - Interface responsive
 
-<div align="center">
-<img src="docs/screenshots/recherche.png" width="400">
-<img src="docs/screenshots/collection.png" width="400">
-</div>
+
 
 <br>
 
@@ -45,7 +42,7 @@ Architecture MVC écrite from scratch : routeur maison, point d'entrée unique, 
 ## Sécurité
 
 - Requêtes préparées PDO sur toutes les requêtes
-- Échappement des sorties (`htmlspecialchars` avec `ENT_QUOTES`)
+- Échappement des sorties (`htmlspecialchars`)
 - Jeton CSRF vérifié sur chaque formulaire
 - Mots de passe hachés en bcrypt
 
