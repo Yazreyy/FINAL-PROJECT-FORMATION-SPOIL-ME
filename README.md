@@ -13,7 +13,7 @@ PHP orienté objet, architecture MVC construite sans framework.</p>
 
 <p><a href="https://spoil-me.alwaysdata.net/Spoil-Me/"><strong>Voir la démo</strong></a></p>
 
-<img src="images/logo-spoil.png" width="800">
+<img src="https://github.com/user-attachments/assets/54ec8904-2d72-47bd-9c6c-cdcfae03d38c" width="800">
 
 </div>
 
