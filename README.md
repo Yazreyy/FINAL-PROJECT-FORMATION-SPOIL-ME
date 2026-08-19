@@ -11,9 +11,9 @@ PHP orienté objet, architecture MVC construite sans framework.</p>
 <img src="https://img.shields.io/badge/TMDB-API-01B4E4?style=flat-square">
 </p>
 
-<p><a href="URL_DU_SITE"><strong>Voir la démo</strong></a></p>
+<p><a href="https://spoil-me.alwaysdata.net/Spoil-Me/"><strong>Voir la démo</strong></a></p>
 
-<img src="docs/screenshots/accueil.png" width="800">
+<img src="images/logo-spoil.png" width="800">
 
 </div>
 
